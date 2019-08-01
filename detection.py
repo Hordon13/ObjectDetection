@@ -7,6 +7,7 @@ import speech_recognition as sr
 import threading
 
 labels = open("yolo3-320/coco.names").read().strip().split("\n")
+message = None
 
 showVideo = False
 message = ""
@@ -50,6 +51,16 @@ def play_effect(sound):
     pa.terminate()
 
 
+def consol():
+    global message
+    while True:
+        message = input()
+        if message == "exit":
+            break
+
+        print(message)
+
+
 def voice_command():
     global showVideo
     rc = sr.Recognizer()
@@ -57,7 +68,6 @@ def voice_command():
     while showVideo:
         mic = sr.Microphone()
         with mic as source:
-            rc.adjust_for_ambient_noise(source, duration=2)
             try:
                 audio = rc.listen(source)
                 result = rc.recognize_google(audio).lower()
