@@ -50,17 +50,6 @@ def play_effect(sound):
     stream.close()
     pa.terminate()
 
-
-def consol():
-    global message
-    while True:
-        message = input()
-        if message == "exit":
-            break
-
-        print(message)
-
-
 def voice_command():
     global showVideo
     rc = sr.Recognizer()
