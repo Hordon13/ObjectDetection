@@ -3,7 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=macos,python,opencv,windows,pycharm+all
 
 # General
-yolov3/*
+yolo3-320/*
 
 ### macOS ###
 # General

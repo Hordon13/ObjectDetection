@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import wave
 import pyaudio
+import speech_recognition as sr
+
+labels = open("yolo3-320/coco.names").read().strip().split("\n")
 
 
 def play_effect(sound):
@@ -32,10 +35,38 @@ def play_effect(sound):
     pa.terminate()
 
 
-def detect_objects(object):
-    cam = cv2.VideoCapture(1)
+def voice_command():
+    rc = sr.Recognizer()
+    print("I'm waiting for your commands!")
+    while True:
+        mic = sr.Microphone()
+        with mic as source:
+            rc.adjust_for_ambient_noise(source, duration=2)
+            try:
+                audio = rc.listen(source)
+                result = rc.recognize_google(audio).lower()
+                if result == "detect":
+                    play_effect("start")
+                    print("I am listening...")
+                    audio = rc.listen(source)
 
-    labels = open("C:/Users/julcs/green_fox/fedex/UrbanSpotter/yolo3-320/coco.names").read().strip().split("\n")
+                    result = rc.recognize_google(audio).lower()
+
+                    if result in labels:
+                        print("Okay, detecting: " + result)
+                        play_effect("end")
+                        detect_objects(result)
+                    else:
+                        print("Sorry, I didn't catch that.")
+                        play_effect("failed")
+
+            except:
+                pass
+
+
+def detect_objects(object):
+    cam = cv2.VideoCapture(0)
+
     np.random.seed(42)
     colors = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
 
