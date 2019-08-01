@@ -1,10 +1,60 @@
 import cv2
+import os
+import numpy as np
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
+
+labels = open("yolov3/coco.names").read().strip().split("\n")
+np.random.seed(42)
+colors = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
+
+net = cv2.dnn.readNetFromDarknet("yolov3/yolov3.cfg", "yolov3/yolov3.weights")
+layerNames = net.getLayerNames()
+layerNames = [layerNames[i[0]-1] for i in net.getUnconnectedOutLayers()]
+(W, H) = (None, None)
 
 while True:
-    ret_val, img = cam.read()
-    cv2.imshow("cam", img)
+    (grabbed, frame) = cam.read()
+    if not grabbed:
+        break
+    if W is None or H is None:
+        (H, W) = frame.shape[:2]
+    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
+    net.setInput(blob)
+    layerOutputs = net.forward(layerNames)
+    boxes = []
+    confidences = []
+    classIDs = []
+    for output in layerOutputs:
+        for detection in output:
+            scores = detection[5:]
+            classID = np.argmax(scores)
+            confidence = scores[classID]
 
+            if confidence > 0.5:
+                box = detection[0:4] * np.array([W, H, W, H])
+                (centerX, centerY, width, height) = box.astype("int")
+
+                x = int(centerX - (width/2))
+                y = int(centerY - (height/2))
+
+                boxes.append([x, y, int(width), int(height)])
+                confidences.append(float(confidence))
+                classIDs.append(classID)
+
+    indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
+
+    if len(indexes) > 0:
+        for i in indexes.flatten():
+            (x, y) = (boxes[i][0], boxes[i][1])
+            (w, h) = (boxes[i][2], boxes[i][3])
+
+            color = [int(c) for c in colors[classIDs[i]]]
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+            text = "{}: {:.2f}".format(labels[classIDs[i]], confidences[i])
+            cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+    cv2.imshow("Breathtaking", frame)
     if cv2.waitKey(3) == 27:
         break
+
