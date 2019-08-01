@@ -7,16 +7,12 @@ import speech_recognition as sr
 import threading
 
 labels = open("yolo3-320/coco.names").read().strip().split("\n")
-message = None
-
-showVideo = False
 message = ""
 
 def consol():
-    global showVideo
     global message
 
-    while showVideo:
+    while True:
         message = input()
         if (message == "exit"):
             print("consol function exiting")
@@ -51,10 +47,10 @@ def play_effect(sound):
     pa.terminate()
 
 def voice_command():
-    global showVideo
+    global message
     rc = sr.Recognizer()
     print("I'm waiting for your commands!")
-    while showVideo:
+    while True:
         mic = sr.Microphone()
         with mic as source:
             try:
@@ -66,11 +62,12 @@ def voice_command():
                     audio = rc.listen(source)
 
                     result = rc.recognize_google(audio).lower()
+                    print(result)
 
                     if result in labels:
                         print("Okay, detecting: " + result)
                         play_effect("end")
-                        detect_objects(result)
+                        message = result
                     else:
                         print("Sorry, I didn't catch that.")
                         play_effect("failed")
@@ -79,8 +76,7 @@ def voice_command():
                 pass
 
 
-def detect_objects(object):
-    global showVideo
+def detect_objects():
     cam = cv2.VideoCapture(0)
 
     np.random.seed(42)
@@ -91,7 +87,7 @@ def detect_objects(object):
     layerNames = [layerNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
     (W, H) = (None, None)
 
-    while showVideo:
+    while True:
         (grabbed, frame) = cam.read()
         if not grabbed:
             break
@@ -139,15 +135,8 @@ def detect_objects(object):
             break
 
 if __name__ == "__main__":
+    t1 = threading.Thread(target=detect_objects)
+    t2 = threading.Thread(target=voice_command)
 
-    # creating threads
-    showVideo = True
-    t1 = threading.Thread(target=consol)
-    t2 = threading.Thread(target=detect_objects, args=(message,))
-    #t1 = multiprocessing.Process(target=consol)
-    #t2 = multiprocessing.Process(target=detect_objects(message))
-
-
-    # starting threads
     t1.start()
     t2.start()
