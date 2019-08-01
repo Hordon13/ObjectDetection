@@ -5,6 +5,7 @@ import pyaudio
 import speech_recognition as sr
 
 labels = open("yolo3-320/coco.names").read().strip().split("\n")
+message = None
 
 
 def play_effect(sound):
@@ -35,13 +36,22 @@ def play_effect(sound):
     pa.terminate()
 
 
+def consol():
+    global message
+    while True:
+        message = input()
+        if message == "exit":
+            break
+
+        print(message)
+
+
 def voice_command():
     rc = sr.Recognizer()
     print("I'm waiting for your commands!")
     while True:
         mic = sr.Microphone()
         with mic as source:
-            rc.adjust_for_ambient_noise(source, duration=2)
             try:
                 audio = rc.listen(source)
                 result = rc.recognize_google(audio).lower()
@@ -120,3 +130,6 @@ def detect_objects(object):
         cv2.imshow("Breathtaking", frame)
         if cv2.waitKey(3) == 27:
             break
+
+
+consol()
