@@ -74,7 +74,6 @@ def voice_command():
 
 
 def main(mode):
-
     if mode == "consol":
         cmd = threading.Thread(target=consol_command)
         cmd.daemon = True
@@ -140,9 +139,19 @@ def main(mode):
         if cv2.waitKey(3) == 27:
             break
 
-    cam.release()
-    cv2.destroyAllWindows()
+    print("Exit program.")
 
 
 if __name__ == "__main__":
-    main("consol")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--voice", help="Enable voice commands", action="store_true")
+    args = parser.parse_args()
+
+    if args.voice:
+        main("voice")
+    else:
+        main("consol")
+
+    cv2.destroyAllWindows()
