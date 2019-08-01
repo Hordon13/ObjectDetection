@@ -1,6 +1,35 @@
 import cv2
 import numpy as np
+import wave
+import pyaudio
 
+
+def play_effect(sound):
+    chunk = 1024
+    effect = None
+
+    if sound == "start":
+        effect = "media/start.wav"
+    elif sound == "end":
+        effect = "media/end.wav"
+    elif sound == "failed":
+        effect = "media/failed.wav"
+
+    wf = wave.open(effect, 'rb')
+    pa = pyaudio.PyAudio()
+    stream = pa.open(format=pa.get_format_from_width(wf.getsampwidth()),
+                     channels=wf.getnchannels(),
+                     rate=wf.getframerate(),
+                     output=True)
+
+    data = wf.readframes(chunk)
+    while len(data) > 0:
+        stream.write(data)
+        data = wf.readframes(chunk)
+
+    stream.stop_stream()
+    stream.close()
+    pa.terminate()
 
 
 def detect_objects(object):
@@ -49,7 +78,6 @@ def detect_objects(object):
         if len(indexes) > 0:
             for i in indexes.flatten():
                 if labels[classIDs[i]] == object:
-
                     (x, y) = (boxes[i][0], boxes[i][1])
                     (w, h) = (boxes[i][2], boxes[i][3])
 
@@ -61,4 +89,3 @@ def detect_objects(object):
         cv2.imshow("Breathtaking", frame)
         if cv2.waitKey(3) == 27:
             break
-detect_objects("person")
