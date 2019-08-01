@@ -152,7 +152,3 @@ if __name__ == "__main__":
     # starting threads
     t1.start()
     t2.start()
-
-    # wait until all threads finish
-    #t1.join()
-    #t2.join()
