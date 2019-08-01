@@ -1,4 +1,3 @@
-import multiprocessing
 import cv2
 import numpy as np
 import wave
@@ -7,17 +6,8 @@ import speech_recognition as sr
 import threading
 
 labels = open("yolo3-320/coco.names").read().strip().split("\n")
-message = ""
+message = None
 
-def consol():
-    global message
-
-    while True:
-        message = input()
-        if (message == "exit"):
-            print("consol function exiting")
-            break
-        print(message)
 
 def play_effect(sound):
     chunk = 1024
@@ -45,6 +35,13 @@ def play_effect(sound):
     stream.stop_stream()
     stream.close()
     pa.terminate()
+
+
+def consol_command():
+    global message
+    while True:
+        message = input()
+
 
 def voice_command():
     global message
@@ -76,7 +73,17 @@ def voice_command():
                 pass
 
 
-def detect_objects():
+def main(mode):
+
+    if mode == "consol":
+        cmd = threading.Thread(target=consol_command)
+        cmd.daemon = True
+        cmd.start()
+    elif mode == "voice":
+        cmd = threading.Thread(target=voice_command)
+        cmd.daemon = True
+        cmd.start()
+
     cam = cv2.VideoCapture(0)
 
     np.random.seed(42)
@@ -131,12 +138,11 @@ def detect_objects():
 
         cv2.imshow("Breathtaking", frame)
         if cv2.waitKey(3) == 27:
-            showVideo = False
             break
 
-if __name__ == "__main__":
-    t1 = threading.Thread(target=detect_objects)
-    t2 = threading.Thread(target=voice_command)
+    cam.release()
+    cv2.destroyAllWindows()
 
-    t1.start()
-    t2.start()
+
+if __name__ == "__main__":
+    main("consol")
