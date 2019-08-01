@@ -1,11 +1,26 @@
+import multiprocessing
 import cv2
 import numpy as np
 import wave
 import pyaudio
 import speech_recognition as sr
+import threading
 
 labels = open("yolo3-320/coco.names").read().strip().split("\n")
 
+showVideo = False
+message = ""
+
+def consol():
+    global showVideo
+    global message
+
+    while showVideo:
+        message = input()
+        if (message == "exit"):
+            print("consol function exiting")
+            break
+        print(message)
 
 def play_effect(sound):
     chunk = 1024
@@ -36,9 +51,10 @@ def play_effect(sound):
 
 
 def voice_command():
+    global showVideo
     rc = sr.Recognizer()
     print("I'm waiting for your commands!")
-    while True:
+    while showVideo:
         mic = sr.Microphone()
         with mic as source:
             rc.adjust_for_ambient_noise(source, duration=2)
@@ -65,6 +81,7 @@ def voice_command():
 
 
 def detect_objects(object):
+    global showVideo
     cam = cv2.VideoCapture(0)
 
     np.random.seed(42)
@@ -75,7 +92,7 @@ def detect_objects(object):
     layerNames = [layerNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
     (W, H) = (None, None)
 
-    while True:
+    while showVideo:
         (grabbed, frame) = cam.read()
         if not grabbed:
             break
@@ -108,7 +125,7 @@ def detect_objects(object):
 
         if len(indexes) > 0:
             for i in indexes.flatten():
-                if labels[classIDs[i]] == object:
+                if labels[classIDs[i]] == message:
                     (x, y) = (boxes[i][0], boxes[i][1])
                     (w, h) = (boxes[i][2], boxes[i][3])
 
@@ -119,4 +136,23 @@ def detect_objects(object):
 
         cv2.imshow("Breathtaking", frame)
         if cv2.waitKey(3) == 27:
+            showVideo = False
             break
+
+if __name__ == "__main__":
+
+    # creating threads
+    showVideo = True
+    t1 = threading.Thread(target=consol)
+    t2 = threading.Thread(target=detect_objects, args=(message,))
+    #t1 = multiprocessing.Process(target=consol)
+    #t2 = multiprocessing.Process(target=detect_objects(message))
+
+
+    # starting threads
+    t1.start()
+    t2.start()
+
+    # wait until all threads finish
+    #t1.join()
+    #t2.join()
