@@ -1,16 +1,15 @@
 import cv2
-import os
 import numpy as np
 
 cam = cv2.VideoCapture(1)
 
-labels = open("yolov3/coco.names").read().strip().split("\n")
+labels = open("C:/Users/julcs/green_fox/fedex/UrbanSpotter/yolo3-320/coco.names").read().strip().split("\n")
 np.random.seed(42)
 colors = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
 
-net = cv2.dnn.readNetFromDarknet("yolov3/yolov3.cfg", "yolov3/yolov3.weights")
+net = cv2.dnn.readNetFromDarknet("./yolo3-320/yolov3.cfg", "./yolo3-320/yolov3.weights")
 layerNames = net.getLayerNames()
-layerNames = [layerNames[i[0]-1] for i in net.getUnconnectedOutLayers()]
+layerNames = [layerNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 (W, H) = (None, None)
 
 while True:
@@ -19,7 +18,7 @@ while True:
         break
     if W is None or H is None:
         (H, W) = frame.shape[:2]
-    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
+    blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (288, 288), swapRB=True, crop=False)
     net.setInput(blob)
     layerOutputs = net.forward(layerNames)
     boxes = []
@@ -31,18 +30,18 @@ while True:
             classID = np.argmax(scores)
             confidence = scores[classID]
 
-            if confidence > 0.5:
+            if confidence > 0.4:
                 box = detection[0:4] * np.array([W, H, W, H])
                 (centerX, centerY, width, height) = box.astype("int")
 
-                x = int(centerX - (width/2))
-                y = int(centerY - (height/2))
+                x = int(centerX - (width / 2))
+                y = int(centerY - (height / 2))
 
                 boxes.append([x, y, int(width), int(height)])
                 confidences.append(float(confidence))
                 classIDs.append(classID)
 
-    indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
+    indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.4, 0.2)
 
     if len(indexes) > 0:
         for i in indexes.flatten():
@@ -50,11 +49,10 @@ while True:
             (w, h) = (boxes[i][2], boxes[i][3])
 
             color = [int(c) for c in colors[classIDs[i]]]
-            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             text = "{}: {:.2f}".format(labels[classIDs[i]], confidences[i])
-            cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
     cv2.imshow("Breathtaking", frame)
     if cv2.waitKey(3) == 27:
         break
-
