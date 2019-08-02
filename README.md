@@ -14,8 +14,8 @@ We decided to use YOLOv3 because it is extremly fast and accurate and you can ea
 
 ## Our goal
 
-We wanted to creat a voice controlled program that can detect objects using YOLOv3.
-For this first we had to implement a detecting function, which is able to handle videocapture and can recognize potential obejct 
+We wanted to create a voice controlled program that can detect objects using YOLOv3.
+For this first we had to implement a detecting function, which is able to handle video capture and can recognize potential object 
 furthermore it can filter the objects based on the users choice. The second part was to produce input for our object detection which can be achieved by using
 console input or voice control. We separated the two essential parts of our program which was camera handling and console/audio input to two different threads by utilizing
 pythons threading library.
