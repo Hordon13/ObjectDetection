@@ -28,8 +28,7 @@ https://pjreddie.com/darknet/yolo/
 
 ## Participants
 
-Horváth Donát
-Varga Júlia
-Varga József
-Varga Viktor
-  
+* [Horváth Donát](https://github.com/green-fox-academy/Hordon13)
+* [Varga József](https://github.com/green-fox-academy/Joco456)
+* [Varga Júlia](https://github.com/green-fox-academy/julcsi2121)
+* [Varga Viktor](https://github.com/green-fox-academy/vviktor807)
