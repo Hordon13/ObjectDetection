@@ -28,8 +28,8 @@ https://pjreddie.com/darknet/yolo/
 
 ## Participants
 
-Horváth Donát
-Varga Júlia
-Varga József
+Horváth Donát\n
+Varga Júlia\n
+Varga József\n
 Varga Viktor
   
