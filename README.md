@@ -1,7 +1,7 @@
 # Urban Spotter
 Ferralita Rosasite Team's FedEx Day Project
 
-# YOLO: Real-Time Object Detection
+## YOLO: Real-Time Object Detection
 
 Object detection is the task of identifying objects in an image or video and drawing bounding boxes around them, i.e. localizing them.
 You only look once (YOLO) is a real-time object detection system developed by Joseph Redmon and Ali Farhadi.
