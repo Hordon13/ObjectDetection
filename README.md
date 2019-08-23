@@ -1,4 +1,4 @@
-# Urban Spotter
+# Voice Activated Object Detection
 Ferralita Rosasite Team's FedEx Day Project
 
 ## YOLO: Real-Time Object Detection
